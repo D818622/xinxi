@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消消乐小游戏教程</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #a1c4fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+        }
+        
+        .game-board {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .game-info {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 250px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 5px;
+            width: 400px;
+            height: 400px;
+        }
+        
+        .cell {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .cell.selected {
+            box-shadow: 0 0 0 3px #fff;
+        }
+        
+        .color-1 { background-color: #FF5252; }
+        .color-2 { background-color: #FF9800; }
+        .color-3 { background-color: #FFEB3B; color: #333; }
+        .color-4 { background-color: #4CAF50; }
+        .color-5 { background-color: #2196F3; }
+        .color-6 { background-color: #9C27B0; }
+        
+        .stats {
+            margin-bottom: 25px;
+        }
+        
+        .stat-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #FFEB3B;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button#reset-btn {
+            background-color: #FF5252;
+        }
+        
+        .tutorial {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            max-width: 850px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .tutorial h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #FFEB3B;
+        }
+        
+        .tutorial ol {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .tutorial li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .tutorial code {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .game-instructions {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+        
+        .highlight {
+            color: #FFEB3B;
+            font-weight: bold;
+        }
+        
+        .match-animation {
+            animation: matchEffect 0.5s;
+        }
+        
+        @keyframes matchEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-grid {
+                width: 320px;
+                height: 320px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>消消乐小游戏</h1>
+            <p class="subtitle">点击相邻的两个色块交换位置，三个或以上相同颜色的色块连成一线即可消除得分！</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-board">
+                <div class="game-grid" id="gameGrid"></div>
+            </div>
+            
+            <div class="game-info">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div>当前分数</div>
+                        <div class="stat-value" id="score">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>剩余步数</div>
+                        <div class="stat-value" id="moves">20</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>游戏状态</div>
+                        <div class="stat-value" id="gameStatus">进行中</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="hint-btn">提示 (H)</button>
+                    <button id="reset-btn">重新开始 (R)</button>
+                </div>
+                
+                <div class="game-instructions">
+                    <p><span class="highlight">游戏规则：</span></p>
+                    <p>1. 点击选择一个色块</p>
+                    <p>2. 点击相邻色块进行交换</p>
+                    <p>3. 三个或以上相同颜色连成一线即可消除</p>
+                    <p>4. 每消除一组得10分，四连得20分，五连得30分</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tutorial">
+            <h2>游戏实现教程</h2>
+            <ol>
+                <li><span class="highlight">游戏网格创建：</span>使用CSS Grid布局创建8x8的游戏网格</li>
+                <li><span class="highlight">色块生成：</span>用JavaScript随机生成6种颜色的色块</li>
+                <li><span class="highlight">交换逻辑：</span>记录第一个点击的色块，然后与相邻的第二个色块交换位置</li>
+                <li><span class="highlight">匹配检测：</span>检查交换后是否有三个或以上相同颜色的色块连成一线（水平或垂直）</li>
+                <li><span class="highlight">消除与得分：</span>移除匹配的色块，补充新的随机色块，并根据匹配数量计分</li>
+                <li><span class="highlight">游戏状态：</span>跟踪步数和分数，当步数为0时结束游戏</li>
+            </ol>
+            <p><span class="highlight">关键函数：</span><code>createGrid()</code>创建游戏板，<code>checkMatches()</code>检测匹配，<code>removeMatches()</code>消除匹配的色块，<code>fillEmptyCells()</code>填充空缺位置。</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 游戏配置
+            const GRID_SIZE = 8;
+            const COLORS = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6'];
+            const COLOR_NAMES = ['红色', '橙色', '黄色', '绿色', '蓝色', '紫色'];
+            
+            // 游戏状态
+            let gameGrid = [];
+            let score = 0;
+            let movesLeft = 20;
+            let firstSelected = null;
+            let gameActive = true;
+            
+            // DOM元素
+            const gameGridElement = document.getElementById('gameGrid');
+            const scoreElement = document.getElementById('score');
+            const movesElement = document.getElementById('moves');
+            const gameStatusElement = document.getElementById('gameStatus');
+            const hintButton = document.getElementById('hint-btn');
+            const resetButton = document.getElementById('reset-btn');
+            
+            // 初始化游戏
+            function initGame() {
+                score = 0;
+                movesLeft = 20;
+                firstSelected = null;
+                gameActive = true;
+                
+                scoreElement.textContent = score;
+                movesElement.textContent = movesLeft;
+                gameStatusElement.textContent = '进行中';
+                gameStatusElement.style.color = '#4CAF50';
+                
+                createGrid();
+            }
+            
+            // 创建游戏网格
+            function createGrid() {
+                gameGrid = [];
+                gameGridElement.innerHTML = '';
+                
+                // 创建初始网格
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    gameGrid[row] = [];
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        // 随机选择颜色，确保初始没有匹配
+                        let colorIndex;
+                        do {
+                            colorIndex = Math.floor(Math.random() * COLORS.length);
+                        } while (
+                            (row >= 2 && 
+                             gameGrid[row-1][col].color === colorIndex && 
+                             gameGrid[row-2][col].color === colorIndex) ||
+                            (col >= 2 && 
+                             gameGrid[row][col-1] && 
+                             gameGrid[row][col-1].color === colorIndex && 
+                             gameGrid[row][col-2] && 
+                             gameGrid[row][col-2].color === colorIndex)
+                        );
+                        
+                        const cell = {
+                            row,
+                            col,
+                            color: colorIndex,
+                            element: null
+                        };
+                        
+                        gameGrid[row][col] = cell;
+                        
+                        // 创建DOM元素
+                        const cellElement = document.createElement('div');
+                        cellElement.className = `cell ${COLORS[colorIndex]}`;
+                        cellElement.dataset.row = row;
+                        cellElement.dataset.col = col;
+                        cellElement.textContent = COLOR_NAMES[colorIndex].charAt(0);
+                        cellElement.addEventListener('click', () => handleCellClick(row, col));
+                        
+                        cell.element = cellElement;
+                        gameGridElement.appendChild(cellElement);
+                    }
+                }
+                
+                // 检查初始网格是否有匹配，如果有则重新生成
+                if (checkMatches(true).length > 0) {
+                    initGame();
+                }
+            }
+            
+            // 处理单元格点击
+            function handleCellClick(row, col) {
+                if (!gameActive) return;
+                
+                const cell = gameGrid[row][col];
+                
+                // 如果没有选中第一个单元格
+                if (firstSelected === null) {
+                    firstSelected = cell;
+                    cell.element.classList.add('selected');
+                    return;
+                }
+                
+                // 如果点击的是已选中的单元格，取消选择
+                if (firstSelected === cell) {
+                    firstSelected.element.classList.remove('selected');
+                    firstSelected = null;
+                    return;
+                }
+                
+                // 检查两个单元格是否相邻
+                const rowDiff = Math.abs(firstSelected.row - row);
+                const colDiff = Math.abs(firstSelected.col - col);
+                
+                if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                    // 交换两个单元格
+                    swapCells(firstSelected, cell, true);
+                } else {
+                    // 取消选择第一个单元格
+                    firstSelected.element.classList.remove('selected');
+                    firstSelected = cell;
+                    cell.element.classList.add('selected');
+                }
+            }
+            
+            // 交换两个单元格
+            function swapCells(cell1, cell2, isPlayerMove = false) {
+                // 移除选中状态
+                cell1.element.classList.remove('selected');
+                firstSelected = null;
+                
+                // 交换颜色
+                const tempColor = cell1.color;
+                cell1.color = cell2.color;
+                cell2.color = tempColor;
+                
+                // 更新UI
+                cell1.element.className = `cell ${COLORS[cell1.color]}`;
+                cell1.element.textContent = COLOR_NAMES[cell1.color].charAt(0);
+                cell2.element.className = `cell ${COLORS[cell2.color]}`;
+                cell2.element.textContent = COLOR_NAMES[cell2.color].charAt(0);
+                
+                // 如果是玩家操作，检查匹配并减少步数
+                if (isPlayerMove) {
+                    movesLeft--;
+                    movesElement.textContent = movesLeft;
+                    
+                    const matches = checkMatches();
+                    
+                    if (matches.length > 0) {
+                        // 有匹配，进行消除
+                        removeMatches(matches);
+                    } else {
+                        // 没有匹配，交换回来
+                        setTimeout(() => {
+                            const tempColorBack = cell1.color;
+                            cell1.color = cell2.color;
+                            cell2.color = tempColorBack;
+                            
+                            cell1.element.className = `cell ${COLORS[cell1.color]}`;
+                            cell1.element.textContent = COLOR_NAMES[cell1.color].charAt(0);
+                            cell2.element.className = `cell ${COLORS[cell2.color]}`;
+                            cell2.element.textContent = COLOR_NAMES[cell2.color].charAt(0);
+                        }, 300);
+                    }
+                    
+                    // 检查游戏是否结束
+                    checkGameOver();
+                }
+            }
+            
+            // 检查匹配
+            function checkMatches(initialCheck = false) {
+                const matches = [];
+                
+                // 检查水平匹配
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE - 2; col++) {
+                        const cell1 = gameGrid[row][col];
+                        const cell2 = gameGrid[row][col+1];
+                        const cell3 = gameGrid[row][col+2];
+                        
+                        if (cell1.color === cell2.color && cell2.color === cell3.color) {
+                            // 检查是否已经有更长的匹配
+                            if (!matches.some(match => 
+                                match.row === row && 
+                                (match.col === col || match.col === col+1 || match.col === col+2)
+                            )) {
+                                // 检查是否有4个或5个匹配
+                                let matchLength = 3;
+                                
+                                if (col < GRID_SIZE - 3 && gameGrid[row][col+3].color === cell1.color) {
+                                    matchLength = 4;
+                                    if (col < GRID_SIZE - 4 && gameGrid[row][col+4].color === cell1.color) {
+                                        matchLength = 5;
+                                    }
+                                }
+                                
+                                for (let i = 0; i < matchLength; i++) {
+                                    if (!matches.some(match => match.row === row && match.col === col+i)) {
+                                        matches.push({row, col: col+i, length: matchLength, horizontal: true});
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 检查垂直匹配
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    for (let row = 0; row < GRID_SIZE - 2; row++) {
+                        const cell1 = gameGrid[row][col];
+                        const cell2 = gameGrid[row+1][col];
+                        const cell3 = gameGrid[row+2][col];
+                        
+                        if (cell1.color === cell2.color && cell2.color === cell3.color) {
+                            // 检查是否已经有更长的匹配
+                            if (!matches.some(match => 
+                                match.col === col && 
+                                (match.row === row || match.row === row+1 || match.row === row+2)
+                            )) {
+                                // 检查是否有4个或5个匹配
+                                let matchLength = 3;
+                                
+                                if (row < GRID_SIZE - 3 && gameGrid[row+3][col].color === cell1.color) {
+                                    matchLength = 4;
+                                    if (row < GRID_SIZE - 4 && gameGrid[row+4][col].color === cell1.color) {
+                                        matchLength = 5;
+                                    }
+                                }
+                                
+                                for (let i = 0; i < matchLength; i++) {
+                                    if (!matches.some(match => match.col === col && match.row === row+i)) {
+                                        matches.push({row: row+i, col, length: matchLength, horizontal: false});
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 如果不是初始检查，添加动画效果
+                if (!initialCheck) {
+                    matches.forEach(match => {
+                        const cell = gameGrid[match.row][match.col];
+                        cell.element.classList.add('match-animation');
+                    });
+                    
+                    setTimeout(() => {
+                        matches.forEach(match => {
+                            const cell = gameGrid[match.row][match.col];
+                            cell.element.classList.remove('match-animation');
+                        });
+                    }, 500);
+                }
+                
+                return matches;
+            }
+            
+            // 移除匹配的单元格
+            function removeMatches(matches) {
+                // 计算得分
+                const matchGroups = [];
+                const processedCells = new Set();
+                
+                matches.forEach(match => {
+                    const key = `${match.row},${match.col}`;
+                    if (!processedCells.has(key)) {
+                        // 找到这个匹配组的所有单元格
+                        const group = [];
+                        for (let i = 0; i < match.length; i++) {
+                            const r = match.horizontal ? match.row : match.row + i;
+                            const c = match.horizontal ? match.col + i : match.col;
+                            group.push({row: r, col: c});
+                            processedCells.add(`${r},${c}`);
+                        }
+                        matchGroups.push(group);
+                    }
+                });
+                
+                // 计算得分
+                let pointsEarned = 0;
+                matchGroups.forEach(group => {
+                    if (group.length === 3) pointsEarned += 10;
+                    else if (group.length === 4) pointsEarned += 20;
+                    else if (group.length >= 5) pointsEarned += 30;
+                });
+                
+                // 更新分数
+                score += pointsEarned;
+                scoreElement.textContent = score;
+                
+                // 将匹配的单元格标记为空
+                matches.forEach(match => {
+                    gameGrid[match.row][match.col].color = -1;
+                });
+                
+                // 等待动画结束后填充空单元格
+                setTimeout(() => {
+                    fillEmptyCells();
+                    
+                    // 填充后检查是否有新的匹配
+                    setTimeout(() => {
+                        const newMatches = checkMatches();
+                        if (newMatches.length > 0) {
+                            removeMatches(newMatches);
+                        }
+                    }, 300);
+                }, 500);
+            }
+            
+            // 填充空单元格
+            function fillEmptyCells() {
+                // 从下往上移动单元格
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    let emptySpaces = 0;
+                    
+                    for (let row = GRID_SIZE - 1; row >= 0; row--) {
+                        if (gameGrid[row][col].color === -1) {
+                            emptySpaces++;
+                        } else if (emptySpaces > 0) {
+                            // 将单元格向下移动
+                            const newRow = row + emptySpaces;
+                            swapCells(gameGrid[newRow][col], gameGrid[row][col]);
+                        }
+                    }
+                    
+                    // 在顶部生成新的随机颜色
+                    for (let row = 0; row < emptySpaces; row++) {
+                        const colorIndex = Math.floor(Math.random() * COLORS.length);
+                        gameGrid[row][col].color = colorIndex;
+                        gameGrid[row][col].element.className = `cell ${COLORS[colorIndex]}`;
+                        gameGrid[row][col].element.textContent = COLOR_NAMES[colorIndex].charAt(0);
+                    }
+                }
+            }
+            
+            // 检查游戏是否结束
+            function checkGameOver() {
+                if (movesLeft <= 0) {
+                    gameActive = false;
+                    gameStatusElement.textContent = '游戏结束';
+                    gameStatusElement.style.color = '#FF5252';
+                }
+            }
+            
+            // 提示功能
+            function showHint() {
+                if (!gameActive) return;
+                
+                // 寻找可能的匹配
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        const cell = gameGrid[row][col];
+                        
+                        // 检查与右侧单元格交换
+                        if (col < GRID_SIZE - 1) {
+                            swapCells(cell, gameGrid[row][col+1]);
+                            const matches = checkMatches(true);
+                            // 换回来
+                            swapCells(cell, gameGrid[row][col+1]);
+                            
+                            if (matches.length > 0) {
+                                // 找到可能的匹配，高亮显示这两个单元格
+                                cell.element.style.boxShadow = '0 0 0 3px #FFEB3B, 0 0 10px #FFEB3B';
+                                gameGrid[row][col+1].element.style.boxShadow = '0 0 0 3px #FFEB3B, 0 0 10px #FFEB3B';
+                                
+                                setTimeout(() => {
+                                    cell.element.style.boxShadow = '';
+                                    gameGrid[row][col+1].element.style.boxShadow = '';
+                                }, 1500);
+                                
+                                return;
+                            }
+                        }
+                        
+                        // 检查与下方单元格交换
+                        if (row < GRID_SIZE - 1) {
+                            swapCells(cell, gameGrid[row+1][col]);
+                            const matches = checkMatches(true);
+                            // 换回来
+                            swapCells(cell, gameGrid[row+1][col]);
+                            
+                            if (matches.length > 0) {
+                                // 找到可能的匹配，高亮显示这两个单元格
+                                cell.element.style.boxShadow = '0 0 0 3px #FFEB3B, 0 0 10px #FFEB3B';
+                                gameGrid[row+1][col].element.style.boxShadow = '0 0 0 3px #FFEB3B, 0 0 10px #FFEB3B';
+                                
+                                setTimeout(() => {
+                                    cell.element.style.boxShadow = '';
+                                    gameGrid[row+1][col].element.style.boxShadow = '';
+                                }, 1500);
+                                
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 事件监听
+            hintButton.addEventListener('click', showHint);
+            resetButton.addEventListener('click', initGame);
+            
+            // 键盘快捷键
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'r' || e.key === 'R') {
+                    initGame();
+                } else if (e.key === 'h' || e.key === 'H') {
+                    showHint();
+                }
+            });
+            
+            // 初始化游戏
+            initGame();
+        });
+    </script>
+</body>
+</html>
